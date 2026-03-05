@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zane.ISystemRoleService;
 import com.zane.core.page.TableDataInfo;
 import com.zane.dto.RoleQueryDto;
-import com.zane.entity.SysUserRole;
 import com.zane.entity.SysRole;
+import com.zane.entity.SysRoleMenu;
+import com.zane.entity.SysUserRole;
 import com.zane.mapper.SysRoleMapper;
+import com.zane.mapper.SysRoleMenuMapper;
 import com.zane.mapper.SysUserRoleMapper;
 import com.zane.vo.SysRoleTreeVo;
 import com.zane.vo.SysRoleVo;
@@ -29,11 +31,15 @@ public class SystemRoleServiceImpl implements ISystemRoleService {
 
     private final SysRoleMapper roleMapper;
     private final SysUserRoleMapper sysUserRoleMapper;
+    private final SysRoleMenuMapper sysRoleMenuMapper;
 
     @Override
     public List<SysRoleVo> getRoleList() {
         List<SysRole> roleList = roleMapper.selectList(new LambdaQueryWrapper<>(SysRole.class));
         List<SysRoleVo> result = BeanUtil.copyToList(roleList, SysRoleVo.class);
+        for (SysRoleVo vo : result) {
+            vo.setMenuIds(roleMapper.getMenuIdsByRoleId(vo.getId()));
+        }
         return result;
     }
 
@@ -65,6 +71,7 @@ public class SystemRoleServiceImpl implements ISystemRoleService {
         IPage<SysRoleVo> voPage = resultPage.convert(role -> {
             SysRoleVo vo = new SysRoleVo();
             BeanUtil.copyProperties(role, vo);
+            vo.setMenuIds(roleMapper.getMenuIdsByRoleId(role.getId()));
             return vo;
         });
 
@@ -78,10 +85,16 @@ public class SystemRoleServiceImpl implements ISystemRoleService {
             return null;
         }
         SysRole role = roleMapper.selectById(id);
-        return role == null ? null : BeanUtil.toBean(role, SysRoleVo.class);
+        if (role == null) {
+            return null;
+        }
+        SysRoleVo roleVo = BeanUtil.toBean(role, SysRoleVo.class);
+        roleVo.setMenuIds(roleMapper.getMenuIdsByRoleId(id));
+        return roleVo;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateByRole(SysRole role) {
         if (role == null || role.getId() == null) {
             return false;
@@ -89,7 +102,19 @@ public class SystemRoleServiceImpl implements ISystemRoleService {
         if (roleMapper.selectById(role.getId()) == null) {
             return false;
         }
-        return roleMapper.updateById(role) > 0;
+        if (roleMapper.updateById(role) > 0) {
+            sysRoleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, role.getId()));
+            if (role.getMenuIds() != null && !role.getMenuIds().isEmpty()) {
+                for (Long menuId : role.getMenuIds()) {
+                    SysRoleMenu sysRoleMenu = new SysRoleMenu();
+                    sysRoleMenu.setRoleId(role.getId());
+                    sysRoleMenu.setMenuId(menuId);
+                    sysRoleMenuMapper.insert(sysRoleMenu);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -102,6 +127,7 @@ public class SystemRoleServiceImpl implements ISystemRoleService {
             return false;
         }
         sysUserRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getRoleId, id));
+        sysRoleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().eq(SysRoleMenu::getRoleId, id));
         return roleMapper.deleteById(id) > 0;
     }
 
@@ -112,16 +138,29 @@ public class SystemRoleServiceImpl implements ISystemRoleService {
             return false;
         }
         sysUserRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().in(SysUserRole::getRoleId, ids));
+        sysRoleMenuMapper.delete(new LambdaQueryWrapper<SysRoleMenu>().in(SysRoleMenu::getRoleId, ids));
         return roleMapper.deleteBatchIds(ids) > 0;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean addRole(SysRole role) {
         if (role == null) {
             return false;
         }
         role.setId(null);
-        return roleMapper.insert(role) > 0;
+        if (roleMapper.insert(role) > 0) {
+            if (role.getMenuIds() != null && !role.getMenuIds().isEmpty()) {
+                for (Long menuId : role.getMenuIds()) {
+                    SysRoleMenu sysRoleMenu = new SysRoleMenu();
+                    sysRoleMenu.setRoleId(role.getId());
+                    sysRoleMenu.setMenuId(menuId);
+                    sysRoleMenuMapper.insert(sysRoleMenu);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

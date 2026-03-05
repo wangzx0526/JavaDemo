@@ -1,5 +1,6 @@
 package com.zane.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -90,5 +91,18 @@ public class SysMenuServiceImpl implements ISysMenuService {
             return false;
         }
         return sysMenuMapper.deleteById(id) > 0;
+    }
+
+    @Override
+    public List<SysMenuTreeVo> getMenuTreeByUserId() {
+        // TODO: 后续可以根据用户ID和角色权限过滤菜单
+        // 目前暂时返回所有菜单
+        // List<SysMenu> list = sysMenuMapper.selectList(
+        //         new LambdaQueryWrapper<SysMenu>().orderByAsc(SysMenu::getSort));
+        // List<SysMenuTreeVo> nodes = BeanUtil.copyToList(list, SysMenuTreeVo.class);
+        Long userId = Long.valueOf(StpUtil.getLoginId().toString());
+        List<SysMenu> list = sysMenuMapper.selectMenusByUserId(userId);
+        List<SysMenuTreeVo> nodes = BeanUtil.copyToList(list, SysMenuTreeVo.class);
+        return buildTree(nodes, 0L);
     }
 }

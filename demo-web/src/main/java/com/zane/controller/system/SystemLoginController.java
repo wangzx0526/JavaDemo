@@ -1,7 +1,6 @@
 package com.zane.controller.system;
 
 import com.zane.ISystemLoginService;
-import com.zane.ISystemUserService;
 import com.zane.dto.UserRegisterDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,10 +12,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "系统登录接口")
-@RequestMapping("/system/")
+@RequestMapping("/system")
 public class SystemLoginController {
     private final ISystemLoginService systemLoginService;
-    private final ISystemUserService systemUserService;
 
     @Operation(summary = "登录")
     @PostMapping("/login")
@@ -25,7 +23,7 @@ public class SystemLoginController {
         if (token == null) {
             return null;
         }
-        return systemLoginService.login(username, password);
+        return token;
     }
 
     @Operation(summary = "注册")

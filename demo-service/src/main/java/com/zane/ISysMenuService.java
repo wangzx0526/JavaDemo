@@ -33,4 +33,7 @@ public interface ISysMenuService {
 
     /** 删除菜单（存在子菜单时不允许删除） */
     boolean deleteById(Long id);
+
+    /** 根据用户ID获取菜单树（用于前端动态加载菜单） */
+    List<SysMenuTreeVo> getMenuTreeByUserId();
 }

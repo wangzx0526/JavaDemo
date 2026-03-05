@@ -4,4 +4,8 @@
     <select id="getRoleIdsByUserId" resultType="java.lang.Long">
         select role_id from sys_user_role where user_id = #{userId}
     </select>
+
+    <select id="getMenuIdsByRoleId" resultType="java.lang.Long">
+        select menu_id from sys_role_menu where role_id = #{roleId}
+    </select>
 </mapper>

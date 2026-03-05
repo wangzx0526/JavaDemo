@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @TableName("sys_role")
@@ -56,4 +57,10 @@ public class SysRole implements Serializable {
      * 排序
      */
     private Integer sort;
+
+    /**
+     * 菜单ID列表（用于设置角色菜单）
+     */
+    @TableField(exist = false)
+    private List<Long> menuIds;
 }

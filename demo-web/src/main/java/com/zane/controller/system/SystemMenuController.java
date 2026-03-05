@@ -7,6 +7,7 @@ import com.zane.dto.MenuQueryDto;
 import com.zane.entity.SysMenu;
 import com.zane.vo.SysMenuTreeVo;
 import com.zane.vo.SysMenuVo;
+import cn.dev33.satoken.stp.StpUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -63,5 +64,12 @@ public class SystemMenuController {
     @DeleteMapping("/delete/{id}")
     public Boolean delete(@PathVariable Long id) {
         return sysMenuService.deleteById(id);
+    }
+
+    @Operation(summary = "根据用户ID获取菜单树（用于前端动态加载菜单）")
+    @GetMapping("/userMenu")
+    public List<SysMenuTreeVo> getUserMenu() {
+        // 获取当前登录用户的ID
+        return sysMenuService.getMenuTreeByUserId();
     }
 }

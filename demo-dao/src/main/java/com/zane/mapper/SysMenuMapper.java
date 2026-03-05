@@ -2,6 +2,9 @@ package com.zane.mapper;
 
 import com.zane.entity.SysMenu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author wzx
@@ -11,6 +14,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface SysMenuMapper extends BaseMapper<SysMenu> {
 
+    /**
+     * 根据用户ID查询菜单列表
+     */
+    List<SysMenu> selectMenusByUserId(@Param("userId") Long userId);
 }
 
 

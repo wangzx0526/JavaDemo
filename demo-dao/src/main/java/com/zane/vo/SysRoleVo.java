@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class SysRoleVo implements Serializable {
@@ -43,4 +44,9 @@ public class SysRoleVo implements Serializable {
      * 排序
      */
     private Integer sort;
+
+    /**
+     * 菜单ID列表
+     */
+    private List<Long> menuIds;
 }
