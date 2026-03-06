@@ -1,6 +1,7 @@
 package com.zane.controller.system;
 
 import com.zane.ISystemLoginService;
+import com.zane.core.domain.R;
 import com.zane.dto.UserRegisterDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,23 +19,25 @@ public class SystemLoginController {
 
     @Operation(summary = "登录")
     @PostMapping("/login")
-    public String login(@RequestParam String username, @RequestParam String password) {
+    public R<String> login(@RequestParam String username, @RequestParam String password) {
         String token = systemLoginService.login(username, password);
         if (token == null) {
-            return null;
+            return R.fail("用户名或密码错误");
         }
-        return token;
+        return R.success(token);
     }
 
     @Operation(summary = "注册")
     @PostMapping("/register")
-    public Boolean register(@RequestBody UserRegisterDto user) {
-        return systemLoginService.register(user);
+    public R<Boolean> register(@RequestBody UserRegisterDto user) {
+        boolean result = systemLoginService.register(user);
+        return R.success(result);
     }
 
     @Operation(summary = "登出")
     @GetMapping("/logout")
-    public void logout() {
+    public R<Void> logout() {
         systemLoginService.logout();
+        return R.success();
     }
 }

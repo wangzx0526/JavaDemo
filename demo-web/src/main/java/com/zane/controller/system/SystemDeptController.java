@@ -2,6 +2,7 @@ package com.zane.controller.system;
 
 import com.zane.ISystemDeptService;
 import com.zane.core.domain.PageQuery;
+import com.zane.core.domain.R;
 import com.zane.core.page.TableDataInfo;
 import com.zane.dto.DeptQueryDto;
 import com.zane.entity.SysDept;
@@ -28,45 +29,49 @@ public class SystemDeptController {
 
     @Operation(summary = "获取部门列表")
     @GetMapping("/list")
-    public List<SysDeptVo> list(
+    public R<List<SysDeptVo>> list(
             @RequestParam(required = false) String deptName,
             @RequestParam(required = false) Integer status) {
-        return systemDeptService.getDeptList(deptName, status);
+        return R.success(systemDeptService.getDeptList(deptName, status));
     }
 
     @Operation(summary = "分页查询部门")
     @GetMapping("/pagelist")
-    public TableDataInfo<SysDeptVo> pagelist(DeptQueryDto deptQueryDto, PageQuery pageQuery) {
-        return systemDeptService.getDeptPageList(pageQuery.build(), deptQueryDto);
+    public R<TableDataInfo<SysDeptVo>> pagelist(DeptQueryDto deptQueryDto, PageQuery pageQuery) {
+        TableDataInfo<SysDeptVo> page = systemDeptService.getDeptPageList(pageQuery.build(), deptQueryDto);
+        return R.success(page);
     }
 
     @Operation(summary = "根据ID获取部门")
     @GetMapping("/{id}")
-    public SysDeptVo get(@PathVariable Long id) {
-        return systemDeptService.getDeptById(id);
+    public R<SysDeptVo> get(@PathVariable Long id) {
+        return R.success(systemDeptService.getDeptById(id));
     }
 
     @Operation(summary = "新增部门")
     @PostMapping("/add")
-    public Boolean add(@RequestBody SysDept dept) {
-        return systemDeptService.addDept(dept);
+    public R<Boolean> add(@RequestBody SysDept dept) {
+        boolean result = systemDeptService.addDept(dept);
+        return R.success(result);
     }
 
     @Operation(summary = "修改部门")
     @PostMapping("/update")
-    public Boolean update(@RequestBody SysDept dept) {
-        return systemDeptService.updateDept(dept);
+    public R<Boolean> update(@RequestBody SysDept dept) {
+        boolean result = systemDeptService.updateDept(dept);
+        return R.success(result);
     }
 
     @Operation(summary = "删除部门")
     @DeleteMapping("/delete/{id}")
-    public Boolean delete(@PathVariable Long id) {
-        return systemDeptService.deleteById(id);
+    public R<Boolean> delete(@PathVariable Long id) {
+        boolean result = systemDeptService.deleteById(id);
+        return R.success(result);
     }
 
     @Operation(summary = "获取部门数据（下拉框使用）")
     @GetMapping("/tree")
-    public List<SysDeptTreeVo> tree() {
-        return systemDeptService.getDeptTree();
+    public R<List<SysDeptTreeVo>> tree() {
+        return R.success(systemDeptService.getDeptTree());
     }
 }

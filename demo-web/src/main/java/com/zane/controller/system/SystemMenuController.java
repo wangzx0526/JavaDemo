@@ -2,6 +2,7 @@ package com.zane.controller.system;
 
 import com.zane.ISysMenuService;
 import com.zane.core.domain.PageQuery;
+import com.zane.core.domain.R;
 import com.zane.core.page.TableDataInfo;
 import com.zane.dto.MenuQueryDto;
 import com.zane.entity.SysMenu;
@@ -30,46 +31,49 @@ public class SystemMenuController {
 
     @Operation(summary = "获取菜单列表（扁平）")
     @GetMapping("/list")
-    public List<SysMenuVo> list(
+    public R<List<SysMenuVo>> list(
             @RequestParam(required = false) String menuName,
             @RequestParam(required = false) Integer status) {
-        return sysMenuService.getList(menuName,  status);
+        return R.success(sysMenuService.getList(menuName,  status));
     }
 
     @Operation(summary = "获取菜单树（树形，用于管理页与下拉）")
     @GetMapping("/tree")
-    public List<SysMenuTreeVo> tree() {
-        return sysMenuService.getMenuTree();
+    public R<List<SysMenuTreeVo>> tree() {
+        return R.success(sysMenuService.getMenuTree());
     }
 
     @Operation(summary = "根据 ID 获取菜单")
     @GetMapping("/{id}")
-    public SysMenuVo get(@PathVariable Long id) {
-        return sysMenuService.getMenuById(id);
+    public R<SysMenuVo> get(@PathVariable Long id) {
+        return R.success(sysMenuService.getMenuById(id));
     }
 
     @Operation(summary = "新增菜单")
     @PostMapping("/add")
-    public Boolean add(@RequestBody SysMenu menu) {
-        return sysMenuService.addMenu(menu);
+    public R<Boolean> add(@RequestBody SysMenu menu) {
+        boolean result = sysMenuService.addMenu(menu);
+        return R.success(result);
     }
 
     @Operation(summary = "修改菜单")
     @PostMapping("/update")
-    public Boolean update(@RequestBody SysMenu menu) {
-        return sysMenuService.updateMenu(menu);
+    public R<Boolean> update(@RequestBody SysMenu menu) {
+        boolean result = sysMenuService.updateMenu(menu);
+        return R.success(result);
     }
 
     @Operation(summary = "删除菜单（存在子菜单时不可删除）")
     @DeleteMapping("/delete/{id}")
-    public Boolean delete(@PathVariable Long id) {
-        return sysMenuService.deleteById(id);
+    public R<Boolean> delete(@PathVariable Long id) {
+        boolean result = sysMenuService.deleteById(id);
+        return R.success(result);
     }
 
     @Operation(summary = "根据用户ID获取菜单树（用于前端动态加载菜单）")
     @GetMapping("/userMenu")
-    public List<SysMenuTreeVo> getUserMenu() {
+    public R<List<SysMenuTreeVo>> getUserMenu() {
         // 获取当前登录用户的ID
-        return sysMenuService.getMenuTreeByUserId();
+        return R.success(sysMenuService.getMenuTreeByUserId());
     }
 }

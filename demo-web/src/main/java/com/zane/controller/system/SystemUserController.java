@@ -2,11 +2,11 @@ package com.zane.controller.system;
 
 import com.zane.ISystemUserService;
 import com.zane.core.domain.PageQuery;
+import com.zane.core.domain.R;
 import com.zane.core.page.TableDataInfo;
 import com.zane.dto.QueryUserDto;
 import com.zane.dto.UserCreateDto;
 import com.zane.dto.UserUpdateDto;
-import com.zane.entity.SysUser;
 import com.zane.vo.SysUserVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,45 +24,50 @@ public class SystemUserController {
 
     @Operation(summary = "获取用户列表")
     @GetMapping("/list")
-    public List<SysUserVo> getUserList() {
-        return systemUserService.getList();
+    public R<List<SysUserVo>> getUserList() {
+        return R.success(systemUserService.getList());
     }
 
     @Operation(summary = "分页查询用户")
     @GetMapping("/pagelist")
-    public TableDataInfo<SysUserVo> list(QueryUserDto queryUserDto, PageQuery pageQuery) {
-        return systemUserService.getPageList(pageQuery.build(), queryUserDto);
+    public R<TableDataInfo<SysUserVo>> list(QueryUserDto queryUserDto, PageQuery pageQuery) {
+        TableDataInfo<SysUserVo> page = systemUserService.getPageList(pageQuery.build(), queryUserDto);
+        return R.success(page);
     }
 
     @Operation(summary = "获取用户")
     @GetMapping("/{id}")
-    public SysUserVo get(@PathVariable Long id) {
-        return systemUserService.getUserById(id);
+    public R<SysUserVo> get(@PathVariable Long id) {
+        return R.success(systemUserService.getUserById(id));
     }
 
 
     @Operation(summary = "新增用户")
     @PostMapping("/add")
-    public Boolean addUser(@RequestBody UserCreateDto user) {
-        return systemUserService.insertUser(user);
+    public R<Boolean> addUser(@RequestBody UserCreateDto user) {
+        boolean result = systemUserService.insertUser(user);
+        return R.success(result);
     }
 
     @Operation(summary = "更新用户")
     @PostMapping("/update")
-    public Boolean updateUser(@RequestBody UserUpdateDto user) {
-        return systemUserService.updateUser(user);
+    public R<Boolean> updateUser(@RequestBody UserUpdateDto user) {
+        boolean result = systemUserService.updateUser(user);
+        return R.success(result);
     }
 
     @Operation(summary = "删除用户")
     @DeleteMapping("/delete/{id}")
-    public Boolean deleteUser(@PathVariable Long id) {
-        return systemUserService.deleteUser(id);
+    public R<Boolean> deleteUser(@PathVariable Long id) {
+        boolean result = systemUserService.deleteUser(id);
+        return R.success(result);
     }
 
     // 批量删除
     @Operation(summary = "批量删除用户")
     @DeleteMapping("/batchDelete") //
-    public Boolean batchDeleteUser(@RequestBody List<Long> ids) {
-        return systemUserService.batchDeleteUser(ids);
+    public R<Boolean> batchDeleteUser(@RequestBody List<Long> ids) {
+        boolean result = systemUserService.batchDeleteUser(ids);
+        return R.success(result);
     }
 }
