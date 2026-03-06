@@ -96,14 +96,18 @@ public class SystemUserServiceImp implements ISystemUserService {
             userEntity.setPassWord(exist.getPassWord());
         }
         userMapper.updateById(userEntity);
-        sysUserRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userEntity.getId()));
-        if (CollectionUtils.isNotEmpty(user.getRoleIds())) {
-            user.getRoleIds().forEach(roleId -> {
-                SysUserRole sysUserRole = new SysUserRole();
-                sysUserRole.setUserId(userEntity.getId());
-                sysUserRole.setRoleId(roleId);
-                sysUserRoleMapper.insert(sysUserRole);
-            });
+        
+        // 只有在传入了角色ID列表时才更新角色关联
+        if (user.getRoleIds() != null) {
+            sysUserRoleMapper.delete(new LambdaQueryWrapper<SysUserRole>().eq(SysUserRole::getUserId, userEntity.getId()));
+            if (CollectionUtils.isNotEmpty(user.getRoleIds())) {
+                user.getRoleIds().forEach(roleId -> {
+                    SysUserRole sysUserRole = new SysUserRole();
+                    sysUserRole.setUserId(userEntity.getId());
+                    sysUserRole.setRoleId(roleId);
+                    sysUserRoleMapper.insert(sysUserRole);
+                });
+            }
         }
         return true;
     }

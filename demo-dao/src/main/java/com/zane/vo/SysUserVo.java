@@ -4,6 +4,7 @@ package com.zane.vo;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -49,4 +50,9 @@ public class SysUserVo implements Serializable {
      * 状态 0-禁用 1-启用
      */
     private Integer status;
+
+    /**
+     * 创建时间
+     */
+    private LocalDateTime createTime;
 }
