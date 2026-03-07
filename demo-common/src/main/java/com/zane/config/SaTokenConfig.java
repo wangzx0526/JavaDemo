@@ -1,26 +1,55 @@
-//package com.zane.config;
-//
-//import cn.dev33.satoken.interceptor.SaInterceptor;
-//import cn.dev33.satoken.stp.StpUtil;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-//
-//@Configuration
-//public class SaTokenConfig implements WebMvcConfigurer {
-//   // 注册拦截器
-//   @Override
-//   public void addInterceptors(InterceptorRegistry registry) {
-//       // 注册 Sa-Token 拦截器，拦截所有路由
-//       registry.addInterceptor(new SaInterceptor(handle -> {
-//           // 检查是否登录，未登录则抛出异常
-//           StpUtil.checkLogin();
-//       }))
-//       .addPathPatterns("/**")
-//       .excludePathPatterns("/system/login")  // 排除登录接口
-//       .excludePathPatterns("/system/register")  // 排除注册接口
-//       .excludePathPatterns("/swagger-ui/**")  // 排除Swagger接口
-//       .excludePathPatterns("/v3/api-docs/**")  // 排除API文档接口
-//       .excludePathPatterns("/doc.html");  // 排除Knife4j接口
-//   }
-//}
+package com.zane.config;
+
+import cn.dev33.satoken.annotation.SaIgnore;
+import cn.dev33.satoken.stp.StpUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Slf4j
+@Configuration
+public class SaTokenConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new HandlerInterceptor() {
+                    @Override
+                    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+                        if (handler instanceof HandlerMethod handlerMethod) {
+                            boolean ignoreMethod = handlerMethod.hasMethodAnnotation(SaIgnore.class);
+                            boolean ignoreClass = AnnotatedElementUtils.hasAnnotation(handlerMethod.getBeanType(), SaIgnore.class);
+                            log.info("sa-token preHandle uri={}, handler={}.{}, ignoreMethod={}, ignoreClass={}",
+                                    request.getRequestURI(),
+                                    handlerMethod.getBeanType().getSimpleName(),
+                                    handlerMethod.getMethod().getName(),
+                                    ignoreMethod,
+                                    ignoreClass);
+                            if (ignoreMethod || ignoreClass) {
+                                return true;
+                            }
+                        }
+
+                        StpUtil.checkLogin();
+                        return true;
+                    }
+                })
+                .addPathPatterns("/**")
+                .excludePathPatterns("/system/login")
+                .excludePathPatterns("/system/register")
+                .excludePathPatterns("/swagger-ui/**")
+                .excludePathPatterns("/swagger-ui.html")
+                .excludePathPatterns("/v3/api-docs/**")
+                .excludePathPatterns("/swagger-resources/**")
+                .excludePathPatterns("/webjars/**")
+                .excludePathPatterns("/doc.html")
+                .excludePathPatterns("/favicon.ico")
+                .excludePathPatterns("/error");
+    }
+}
+

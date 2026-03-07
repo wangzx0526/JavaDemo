@@ -1,5 +1,7 @@
 package com.zane.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaIgnore;
 import com.zane.ISystemUserService;
 import com.zane.core.domain.PageQuery;
 import com.zane.core.domain.R;
@@ -22,6 +24,8 @@ import java.util.List;
 public class SystemUserController {
     private final ISystemUserService systemUserService;
 
+
+    @SaIgnore
     @Operation(summary = "获取用户列表")
     @GetMapping("/list")
     public R<List<SysUserVo>> getUserList() {
@@ -35,6 +39,7 @@ public class SystemUserController {
         return R.success(page);
     }
 
+    @SaCheckLogin
     @Operation(summary = "获取用户")
     @GetMapping("/{id}")
     public R<SysUserVo> get(@PathVariable Long id) {
