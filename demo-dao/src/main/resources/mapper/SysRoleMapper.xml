@@ -5,6 +5,14 @@
         select role_id from sys_user_role where user_id = #{userId}
     </select>
 
+    <select id="getRoleCodesByUserId" resultType="java.lang.String">
+        select distinct r.role_code
+        from sys_role r
+        inner join sys_user_role ur on r.id = ur.role_id
+        where ur.user_id = #{userId}
+          and r.deleted = 0
+    </select>
+
     <select id="getMenuIdsByRoleId" resultType="java.lang.Long">
         select menu_id from sys_role_menu where role_id = #{roleId}
     </select>

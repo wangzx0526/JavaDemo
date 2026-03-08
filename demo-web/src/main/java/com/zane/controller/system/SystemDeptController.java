@@ -1,5 +1,6 @@
 package com.zane.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.zane.ISystemDeptService;
 import com.zane.core.domain.PageQuery;
 import com.zane.core.domain.R;
@@ -49,6 +50,7 @@ public class SystemDeptController {
     }
 
     @Operation(summary = "新增部门")
+    @SaCheckPermission("sys:dept:add")
     @PostMapping("/add")
     public R<Boolean> add(@RequestBody SysDept dept) {
         boolean result = systemDeptService.addDept(dept);
@@ -56,6 +58,7 @@ public class SystemDeptController {
     }
 
     @Operation(summary = "修改部门")
+    @SaCheckPermission("sys:dept:update")
     @PostMapping("/update")
     public R<Boolean> update(@RequestBody SysDept dept) {
         boolean result = systemDeptService.updateDept(dept);
@@ -63,6 +66,7 @@ public class SystemDeptController {
     }
 
     @Operation(summary = "删除部门")
+    @SaCheckPermission("sys:dept:delete")
     @DeleteMapping("/delete/{id}")
     public R<Boolean> delete(@PathVariable Long id) {
         boolean result = systemDeptService.deleteById(id);

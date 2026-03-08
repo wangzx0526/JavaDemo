@@ -1,5 +1,6 @@
 package com.zane.controller.system;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.zane.ISystemRoleService;
 import com.zane.core.domain.PageQuery;
 import com.zane.core.domain.R;
@@ -45,6 +46,7 @@ public class SystemRoleController {
     }
 
     @Operation(summary = "修改角色信息")
+    @SaCheckPermission("sys:role:update")
     @PostMapping("/update")
     public R<Boolean> update(@RequestBody SysRole role) {
         boolean result = systemRoleService.updateByRole(role);
@@ -53,6 +55,7 @@ public class SystemRoleController {
 
 
     @Operation(summary = "新增角色")
+    @SaCheckPermission("sys:role:add")
     @PostMapping("/add")
     public R<Boolean> add(@RequestBody SysRole role) {
         boolean result = systemRoleService.addRole(role);
@@ -60,6 +63,7 @@ public class SystemRoleController {
     }
 
     @Operation(summary = "删除角色")
+    @SaCheckPermission("sys:role:delete")
     @DeleteMapping("/delete/{id}")
     public R<Boolean> delete(@PathVariable Long id) {
         boolean result = systemRoleService.deleteById(id);
@@ -67,6 +71,7 @@ public class SystemRoleController {
     }
 
     @Operation(summary = "批量删除角色")
+    @SaCheckPermission("sys:role:delete")
     @DeleteMapping("/batchDelete")
     public R<Boolean> batchDelete(@RequestBody List<Long> ids) {
         boolean result = systemRoleService.batchDelete(ids);

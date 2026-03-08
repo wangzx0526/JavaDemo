@@ -3,11 +3,7 @@ package com.zane.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.zane.ISysMenuService;
-import com.zane.core.page.TableDataInfo;
-import com.zane.dto.MenuQueryDto;
 import com.zane.entity.SysMenu;
 import com.zane.mapper.SysMenuMapper;
 import com.zane.vo.SysMenuTreeVo;
@@ -17,18 +13,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 菜单权限 Service 实现（RBAC 菜单管理）
- *
- * @author wzx
- */
 @Slf4j
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class SysMenuServiceImpl implements ISysMenuService {
+
+    private static final String BUTTON_MENU_TYPE = "F";
 
     private final SysMenuMapper sysMenuMapper;
 
@@ -38,26 +32,14 @@ public class SysMenuServiceImpl implements ISysMenuService {
         queryWrapper.like(StringUtils.isNotBlank(menuName), SysMenu::getMenuName, menuName)
                 .eq(status != null, SysMenu::getStatus, status)
                 .orderByAsc(SysMenu::getSort);
-
-        List<SysMenu> list = sysMenuMapper.selectList(queryWrapper);
-        return BeanUtil.copyToList(list, SysMenuVo.class);
+        return BeanUtil.copyToList(sysMenuMapper.selectList(queryWrapper), SysMenuVo.class);
     }
-
 
     @Override
     public List<SysMenuTreeVo> getMenuTree() {
         List<SysMenu> list = sysMenuMapper.selectList(
                 new LambdaQueryWrapper<SysMenu>().orderByAsc(SysMenu::getSort));
-        List<SysMenuTreeVo> nodes = BeanUtil.copyToList(list, SysMenuTreeVo.class);
-        return buildTree(nodes, 0L);
-    }
-
-    /** 递归构建树，parentId 为 0 表示顶级 */
-    private List<SysMenuTreeVo> buildTree(List<SysMenuTreeVo> nodes, Long parentId) {
-        return nodes.stream()
-                .filter(n -> parentId.equals(n.getParentId()))
-                .peek(n -> n.setChildren(buildTree(nodes, n.getId())))
-                .collect(Collectors.toList());
+        return buildTree(BeanUtil.copyToList(list, SysMenuTreeVo.class), 0L);
     }
 
     @Override
@@ -65,8 +47,7 @@ public class SysMenuServiceImpl implements ISysMenuService {
         if (id == null) {
             return null;
         }
-        SysMenu menu = sysMenuMapper.selectById(id);
-        return BeanUtil.toBean(menu, SysMenuVo.class);
+        return BeanUtil.toBean(sysMenuMapper.selectById(id), SysMenuVo.class);
     }
 
     @Override
@@ -95,14 +76,39 @@ public class SysMenuServiceImpl implements ISysMenuService {
 
     @Override
     public List<SysMenuTreeVo> getMenuTreeByUserId() {
-        // TODO: 后续可以根据用户ID和角色权限过滤菜单
-        // 目前暂时返回所有菜单
-        // List<SysMenu> list = sysMenuMapper.selectList(
-        //         new LambdaQueryWrapper<SysMenu>().orderByAsc(SysMenu::getSort));
-        // List<SysMenuTreeVo> nodes = BeanUtil.copyToList(list, SysMenuTreeVo.class);
         Long userId = Long.valueOf(StpUtil.getLoginId().toString());
-        List<SysMenu> list = sysMenuMapper.selectMenusByUserId(userId);
-        List<SysMenuTreeVo> nodes = BeanUtil.copyToList(list, SysMenuTreeVo.class);
-        return buildTree(nodes, 0L);
+        List<SysMenu> list = sysMenuMapper.selectMenusByUserId(userId).stream()
+                .filter(menu -> !BUTTON_MENU_TYPE.equalsIgnoreCase(menu.getMenuType()))
+                .toList();
+        return buildTree(BeanUtil.copyToList(list, SysMenuTreeVo.class), 0L);
+    }
+
+    @Override
+    public List<String> getPermsByUserId(Long userId) {
+        if (userId == null) {
+            return List.of();
+        }
+        return sysMenuMapper.selectPermsByUserId(userId).stream()
+                .filter(StringUtils::isNotBlank)
+                .flatMap(perms -> Arrays.stream(perms.split(",")))
+                .map(String::trim)
+                .filter(StringUtils::isNotBlank)
+                .distinct()
+                .toList();
+    }
+
+    @Override
+    public List<String> getLoginUserPerms() {
+        if (!StpUtil.isLogin()) {
+            return List.of();
+        }
+        return getPermsByUserId(Long.valueOf(StpUtil.getLoginId().toString()));
+    }
+
+    private List<SysMenuTreeVo> buildTree(List<SysMenuTreeVo> nodes, Long parentId) {
+        return nodes.stream()
+                .filter(node -> parentId.equals(node.getParentId()))
+                .peek(node -> node.setChildren(buildTree(nodes, node.getId())))
+                .collect(Collectors.toList());
     }
 }

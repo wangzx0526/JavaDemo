@@ -1,6 +1,7 @@
 package com.zane.controller.system;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaIgnore;
 import com.zane.ISystemUserService;
 import com.zane.core.domain.PageQuery;
@@ -48,6 +49,7 @@ public class SystemUserController {
 
 
     @Operation(summary = "新增用户")
+    @SaCheckPermission("sys:user:add")
     @PostMapping("/add")
     public R<Boolean> addUser(@RequestBody UserCreateDto user) {
         boolean result = systemUserService.insertUser(user);
@@ -55,6 +57,7 @@ public class SystemUserController {
     }
 
     @Operation(summary = "更新用户")
+    @SaCheckPermission("sys:user:update")
     @PostMapping("/update")
     public R<Boolean> updateUser(@RequestBody UserUpdateDto user) {
         boolean result = systemUserService.updateUser(user);
@@ -62,6 +65,7 @@ public class SystemUserController {
     }
 
     @Operation(summary = "删除用户")
+    @SaCheckPermission("sys:user:delete")
     @DeleteMapping("/delete/{id}")
     public R<Boolean> deleteUser(@PathVariable Long id) {
         boolean result = systemUserService.deleteUser(id);
@@ -70,6 +74,7 @@ public class SystemUserController {
 
     // 批量删除
     @Operation(summary = "批量删除用户")
+    @SaCheckPermission("sys:user:delete")
     @DeleteMapping("/batchDelete") //
     public R<Boolean> batchDeleteUser(@RequestBody List<Long> ids) {
         boolean result = systemUserService.batchDeleteUser(ids);
