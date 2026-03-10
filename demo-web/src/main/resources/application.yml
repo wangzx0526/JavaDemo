@@ -5,6 +5,11 @@ spring:
   application:
     name: ZaneStudyDemo
 
+  # 资源信息
+  messages:
+    # 国际化资源文件路径
+    basename: i18n/messages
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://192.168.91.143:3306/demo?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&useSSL=false&allowPublicKeyRetrieval=true

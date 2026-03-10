@@ -3,4 +3,26 @@
 <mapper namespace="com.zane.mapper.SysUserMapper">
 
 
+<select id="getMenuPermission" resultType="java.lang.String">
+    SELECT DISTINCT m.perms
+    FROM sys_menu m
+    INNER JOIN sys_role_menu rm ON m.id = rm.menu_id
+    INNER JOIN sys_user_role ur ON rm.role_id = ur.role_id
+    WHERE ur.user_id = #{userId}
+      AND m.status = 0
+      AND m.deleted = 0
+      AND m.perms IS NOT NULL
+      AND m.perms != ''
+</select>
+    <select id="getRoleCodes" resultType="java.lang.String">
+        SELECT DISTINCT r.role_code
+        FROM sys_role r
+        INNER JOIN sys_user_role ur ON r.id = ur.role_id
+        WHERE ur.user_id = #{userId}
+          AND r.status = 1
+          AND r.deleted = 0
+          AND r.role_code IS NOT NULL
+          AND r.role_code != ''
+    </select>
+
 </mapper>

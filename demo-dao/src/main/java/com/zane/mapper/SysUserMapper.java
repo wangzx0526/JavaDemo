@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.zane.entity.SysUser;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Set;
+
 /**
  * 用户Mapper接口
  *
@@ -13,4 +15,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface SysUserMapper extends BaseMapper<SysUser> {
 
+    Set<String> getMenuPermission(Long userId);
+
+    Set<String> getRoleCodes(Long userId);
 }

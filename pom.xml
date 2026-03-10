@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.10</version>
+        <version>3.3.10</version>
         <relativePath/>
     </parent>
 
@@ -29,6 +29,8 @@
         <lombok.version>1.18.36</lombok.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <hutool.version>5.8.38</hutool.version>
+        <!-- 离线IP地址定位库 -->
+        <ip2region.version>2.7.0</ip2region.version>
     </properties>
 
     <modules>
@@ -88,6 +90,13 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.version}</version> <!-- 引用 properties 中定义的版本 -->
+            </dependency>
+
+            <!-- 离线IP地址定位库 ip2region -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

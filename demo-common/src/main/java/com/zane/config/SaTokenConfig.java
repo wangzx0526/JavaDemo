@@ -37,14 +37,16 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 }))
                 .addPathPatterns("/**")
                 .excludePathPatterns("/system/login")
-                .excludePathPatterns("/system/register")
-                .excludePathPatterns("/swagger-ui/**")
-                .excludePathPatterns("/swagger-ui.html")
-                .excludePathPatterns("/v3/api-docs/**")
-                .excludePathPatterns("/swagger-resources/**")
-                .excludePathPatterns("/webjars/**")
-                .excludePathPatterns("/doc.html")
-                .excludePathPatterns("/favicon.ico")
-                .excludePathPatterns("/error");
+                .excludePathPatterns(  // Swagger3
+                        "/swagger-resources/**",
+                        "/webjars/**",
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html/**",
+                        "/doc.html/**",
+                        "/error",
+                        "/favicon.ico",
+                        "/webjars/**",
+                        "/swagger-ui/**"
+                ).excludePathPatterns("/error");
     }
 }

@@ -23,6 +23,4 @@ public interface ISysMenuService {
     List<SysMenuTreeVo> getMenuTreeByUserId();
 
     List<String> getPermsByUserId(Long userId);
-
-    List<String> getLoginUserPerms();
 }

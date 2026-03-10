@@ -97,14 +97,6 @@ public class SysMenuServiceImpl implements ISysMenuService {
                 .toList();
     }
 
-    @Override
-    public List<String> getLoginUserPerms() {
-        if (!StpUtil.isLogin()) {
-            return List.of();
-        }
-        return getPermsByUserId(Long.valueOf(StpUtil.getLoginId().toString()));
-    }
-
     private List<SysMenuTreeVo> buildTree(List<SysMenuTreeVo> nodes, Long parentId) {
         return nodes.stream()
                 .filter(node -> parentId.equals(node.getParentId()))
